@@ -90,25 +90,28 @@ wdi.povt <- dcast(melt(as.data.table(wdi.pov), id.vars = c("Country.Name",
 missing <- wdi.povt %>% summarize_all(funs(sum(is.na(.))/n()))
 missing <- gather(missing, key="feature", value="missing_pct")
 goodv <- filter(missing, missing_pct<0.25)
-
-unique(wdi.povt$Country.Name)
-# "Fragile and conflict affected situations"
-
 goodvalues <-as.vector(goodv[,1])
+goodvalues <- append(goodvalues, "SI.POV.LMIC.GP")
 
-# names(wdi.povt)
-# str(goodvalues) 
-# chr [1:403]
+which( colnames(wdi.povt)=="SI.POV.LMIC.GP" )
 
-pdata=subset(wdi.povt,select=c("Country.Name", goodvalues))
-pdata1 <- pdata[,-c(1,3)]
+pdata <- subset(wdi.povt,select=c("Country.Name", goodvalues))
+pdata1 <- pdata[,-c(1:3)]
+
+which( colnames(pdata1)=="SI.POV.LMIC.GP" )
 
 # Remove X from "variable"
 pdata1$variable <- pdata1$variable %>%  str_replace(".*X","")
 
 # Transform to numeric
-pdata1$variable <- as.numeric (pdata1$variable)
+pdata1$variable <- as.numeric(pdata1$variable)
 
 # str(pdata)
 cor(pdata1, use="complete.obs")
 corrplot(cor(pdata1, use="complete.obs"),type="lower")
+
+pdata2 <- pdata[,-c(1)]
+cor(pdata2, use="complete.obs")
+corrplot(cor(pdata2, use="complete.obs"),type="lower")
+
+# which( colnames(pdata)=="SI.POV.LMIC.GP" )
